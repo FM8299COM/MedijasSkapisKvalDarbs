@@ -1,0 +1,62 @@
+html {
+    font-size: 14px;
+}
+
+@media (min-width: 768px) {
+    html {
+        font-size: 16px;
+    }
+}
+
+body {
+    color: #ffffff;
+    background-color: #4f4f4f; /* dark grey */
+    margin-bottom: 60px;
+}
+
+.navbar {
+    background-color: #ffffff !important; /* white */
+}
+
+    .navbar .nav-link {
+        color: #000000 !important; /* black */
+    }
+
+
+.badge-custom {
+    background-color: #4f4f4f; /* Gray background */
+    color: #ffffff; /* white text */
+}
+
+b {
+    color: black;
+}
+
+.card-body {
+    padding: 0;
+}
+
+/*This is for description but isnt working at the moment*/
+.truncate {
+    display: inline-block;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 250px; /* Adjust this to your needs */
+}
+
+.biography-text {
+    background-color: #f8f9fa; /* Change to the color you want */
+    color: #212529; /* Change to the color you want */
+    padding: .375rem .75rem;
+    margin-bottom: 1rem;
+    border-radius: .25rem;
+}
+
+.bd-placeholder-img {
+    font-size: 1.125rem;
+    text-anchor: middle;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    user-select: none;
+}

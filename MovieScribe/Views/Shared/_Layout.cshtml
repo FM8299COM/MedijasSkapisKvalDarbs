@@ -1,0 +1,78 @@
+﻿@inject IHttpContextAccessor HttpContextAccessor
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - MovieScribe</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/MovieScribe.styles.css" asp-append-version="true" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.3/font/bootstrap-icons.css">
+</head>
+<body>
+    <header>
+        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light border-bottom box-shadow mb-3">
+            <div class="container-fluid">
+                <a class="navbar-brand" asp-controller="Home" asp-action="Index">MedijuSkapis</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
+                        aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                    <ul class="navbar-nav flex-grow-1">
+                        <span style="padding: 5px;"></span>
+                        <a class="btn btn-success my-2 my-sm-0" asp-controller="Media" asp-action="Index">
+                            Media
+                        </a>
+                        @if (User.IsInRole("admin") || User.IsInRole("moderator"))
+                        {
+                            <li class="dropdown">
+                                <a class="btn dropdown-toggle" href="#" type="button" style="color: black" data-bs-toggle="dropdown" aria-expanded="false">
+                                    Admin Pages
+                                </a>
+
+                                <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                    <a class="dropdown-item" asp-controller="Media" asp-action="Index"> Filmas</a>
+                                    <a class="dropdown-item" asp-controller="Studio" asp-action="Index"> Studijas</a>
+                                    <a class="dropdown-item" asp-controller="Distributor" asp-action="Index"> Izplatītājs</a>
+                                    <a class="dropdown-item" asp-controller="Actor" asp-action="Index"> Aktieri</a>
+                                    <a class="dropdown-item" asp-controller="Writer" asp-action="Index"> Rakstnieki</a>
+                                    <a class="dropdown-item" asp-controller="Producer" asp-action="Index"> Producenti</a>
+                                </div>
+                            </li>
+                        }
+                    </ul>
+                    @{
+                        var controller = HttpContextAccessor.HttpContext?.GetRouteData()?.Values["Controller"];
+                    }
+
+                    @if (controller?.ToString() == "Media")
+                    {
+                        <form class="form-inline my-2 my-lg-0" asp-controller="Media" asp-action="Filter" style="padding-right: 25px;">
+                            <div class="input-group">
+                                <input name="searchString" type="text" class="form-control rounded" style="margin-right:10px;" placeholder="Search for media..." aria-label="Recipient's username" aria-describedby="button-addon2">
+                                <div class="input-group-append">
+                                    <button class="btn btn-success rounded" type="submit"><i class="bi bi-search"></i></button>
+                                </div>
+                            </div>
+                        </form>
+                    }
+
+                    <partial name="_IdentityLayout.cshtml" />
+                </div>
+            </div>
+        </nav>
+    </header>
+    <div class="container-fluid">
+        <main role="main" class="pb-3">
+            @RenderBody()
+        </main>
+    </div>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-A3rJD856KowSb7dwlZdYEkO39Gagi7vIsF0jrRAoQmDKKtQBHUuLZ9AsSv4jD4Xa" crossorigin="anonymous"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

@@ -1,0 +1,55 @@
+﻿<!doctype html>
+<html lang="en">
+<body>
+    <main>
+        <div class="container py-4">
+
+            <div class="p-5 mb-4 bg-light rounded-3 text-dark">
+                <div class="container-fluid py-5">
+                    <h1 class="display-5 fw-bold">Movie Recommendations Made Just for You</h1>
+                    <p class="col-md-8 fs-4">Welcome to MovieScribe application, a haven for movie enthusiasts. We've created a platform that not only gives you detailed statistics about films but also curates personalized recommendations based on the movies you've watched. Let's dive into a cinematic adventure tailored just for you.</p>
+                    @if (!(User.Identity.IsAuthenticated))
+                    {
+                        <form asp-controller="Account" asp-action="Login">
+                            <button class="btn btn-secondary" type="submit">Login</button>
+                        </form>
+                    }
+                    @if (User.Identity.IsAuthenticated)
+                    {
+                        <form asp-controller="Media" asp-action="Index">
+                            <button class="btn btn-secondary" type="submit">Lets start watching!</button>
+                        </form>
+                    }
+                </div>
+            </div>
+            <div class="row align-items-md-stretch">
+                <div class="col-md-6">
+                    <div class="h-100 p-5 text-white bg-dark rounded-3">
+                        <h2>Deep-dive into Movie Statistics</h2>
+                        <p>Our site brings an abundance of detailed statistics from your moview viewing statistics. Learn about your top 5 most viewed actors, total time spent watching, top 5 most viewed genres, and much more. The more you know, the better your movie selection will be.</p>
+                        @if (User.Identity.IsAuthenticated)
+                        {
+                            <form asp-controller="Media" asp-action="Watched">
+                                <button class="btn btn-secondary" type="submit">Stats</button>
+                            </form>
+                        }
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="h-100 p-5 bg-light border rounded-3 text-dark">
+                        <h2>Personalized Recommendations</h2>
+                        <p>We believe in a personalized movie-watching experience. Our recommendation engine carefully analyzes your movie history and preferences to suggest films that you'll love. It's like having a personal movie critic at your service!</p>
+                        @if (User.Identity.IsAuthenticated)
+                        {
+                            <form asp-controller="Media" asp-action="Recommendations">
+                                <button class="btn btn-secondary" type="submit">Recommendations</button>
+                            </form>
+                        }
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+</body>
+</html>

@@ -1,0 +1,53 @@
+﻿@using X.PagedList;
+@using X.PagedList.Mvc.Core;
+@using X.PagedList.Web.Common;
+@model IPagedList<MediaModel>
+
+<div class="d-flex flex-wrap justify-content-around">
+    @if (TempData["FailureMessage"] != null)
+    {
+        <div class="alert alert-danger">
+            @TempData["FailureMessage"]
+        </div>
+    }
+    @foreach (var item in Model)
+    {
+        var imgSrc = "https://t4.ftcdn.net/jpg/02/51/95/53/360_F_251955356_FAQH0u1y1TZw3ZcdPGybwUkH90a3VAhb.jpg";
+        if (item.ImageData != null && item.ImageMimeType != null)
+        {
+            var base64 = Convert.ToBase64String(item.ImageData);
+            imgSrc = String.Format($"data:{item.ImageMimeType};base64,{base64}");
+        }
+
+        <div class="card mb-4 border-0" style="width: 25rem; background-color: #4f4f4f;">
+            <div class="d-flex flex-column">
+                <a asp-action="Details" asp-route-id="@item.ID" style="flex-grow: 0;">
+                    <img src="@imgSrc" class="card-img-top" style="max-height: 1000px ; height: auto; object-fit: cover;" alt="@item.Title" />
+                </a>
+                <div class="card-body bg-dark text-white d-flex flex-column align-items-center" style="flex-grow: 1;">
+                    <a asp-action="Details" asp-route-id="@item.ID" class="text-white" style="text-decoration: none;">
+                        <h5 class="text-center">@item.Title</h5>
+                    </a>
+                    @{
+                        System.Diagnostics.Debug.WriteLine($"Media ID in View: {item.ID}");
+                    }
+                    <div class="mt-2">
+                        <a class="btn btn-primary" asp-action="AddToPlanToWatch" asp-route-mediaId="@item.ID">Add To Plan To Watch</a>
+                        <a class="btn btn-primary" asp-action="AddToWatched" asp-route-mediaId="@item.ID">Add To Watched</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+@Html.PagedListPager(Model, page => Url.Action("Index", new { page }), new PagedListRenderOptions
+{
+    DisplayLinkToFirstPage = PagedListDisplayMode.Never,
+    DisplayLinkToLastPage = PagedListDisplayMode.Never,
+    DisplayLinkToPreviousPage = PagedListDisplayMode.Never,
+    DisplayLinkToNextPage = PagedListDisplayMode.Never,
+    DisplayPageCountAndCurrentLocation = false,
+    MaximumPageNumbersToDisplay = 5,
+    DisplayEllipsesWhenNotShowingAllPageNumbers = true,
+    UlElementClasses = new[] { "pagination justify-content-center" }, // bootstrap classes to center the pagination
+})

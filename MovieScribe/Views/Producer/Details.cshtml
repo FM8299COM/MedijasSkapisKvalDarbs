@@ -1,0 +1,51 @@
+﻿@model ProducerModel
+
+<section class="vh-100 gradient-custom">
+    <div class="container py-5 h-100">
+        <div class="row d-flex justify-content-center align-items-center h-100">
+            <div class="col-12 col-lg-10">
+                <div class="card bg-dark text-white" style="border-radius: 1rem;">
+                    <div class="card-body p-5 text-center">
+
+                        <div class="mb-md-5 mt-md-4 pb-5">
+                            <h2 class="fw-bold mb-2 text-uppercase">@Model.FullName Details</h2>
+
+                            <div class="row">
+                                <div class="col-md-6 pr-md-5">
+                                    @if (Model.ImageData != null && Model.ImageMimeType != null)
+                                    {
+                                        var base64 = Convert.ToBase64String(Model.ImageData);
+                                        var imgSrc = String.Format($"data:{Model.ImageMimeType};base64,{base64}");
+                                        <img src="@imgSrc" class="img-fluid rounded" style="max-width: 600px; max-height: 600px; object-fit: contain;" />
+                                    }
+                                    else
+                                    {
+                                        <img src="https://t4.ftcdn.net/jpg/02/51/95/53/360_F_251955356_FAQH0U1y1TZw3ZcdPGybwUkH90a3VAhb.jpg" class="img-fluid rounded" style="max-width: 600px; max-height: 600px; object-fit: contain;" />
+                                    }
+                                </div>
+
+                                <div class="col-md-6 text-left pl-md-5">
+                                    <div class="form-group">
+                                        <p class="card-text">
+                                            <b style="color: white;">Age:</b>
+                                            <div class="badge badge-pill badge-custom" style="font-size: 1.2em;">
+                                                @Model.Age
+                                            </div>
+                                        </p>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <b style="color: white;">Biography:</b>
+                                        <p class="biography-text" style="font-size: 1.2em;">
+                                            @Model.Biography
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

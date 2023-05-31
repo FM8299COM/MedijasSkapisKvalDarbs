@@ -1,0 +1,109 @@
+﻿@using X.PagedList;
+@using X.PagedList.Mvc.Core;
+@using X.PagedList.Web.Common;
+@model IPagedList<WatchedModel>
+
+<div class="row">
+    @if (TempData["FailureMessage"] != null)
+    {
+        <div class="alert alert-danger">
+            @TempData["FailureMessage"]
+        </div>
+    }
+    <div>
+        <a class="btn btn-success" asp-action="GenerateReport"><i class="bi bi-file-earmark-text"></i> Generate Report</a>
+    </div>
+    <div style="display: flex; flex-wrap: wrap; justify-content: space-between; margin-bottom: 10px">
+        <div style="width: 20%;">
+            <h3>Total Runtime: @ViewBag.TotalRuntime minutes</h3>
+        </div>
+        <div style="width: 20%;">
+            <h3>Average Runtime: @ViewBag.averageRuntime minutes</h3>
+        </div>
+        <div style="width: 20%;">
+            <h3>Top 5 Genres:</h3>
+            @foreach (var genre in ViewBag.Top5Genres)
+            {
+                <div>@genre.Genre: @genre.Count</div>
+            }
+        </div>
+        <div style="width: 20%;">
+            <h3>Top 5 Media Types:</h3>
+            @foreach (var mediaType in ViewBag.Top5MediaTypes)
+            {
+                <div>@mediaType.Type: @mediaType.Count</div>
+            }
+        </div>
+        <div style="width: 20%;">
+            <h3>Top 3 Distributors:</h3>
+            @foreach (var distributor in ViewBag.Top3Distributors)
+            {
+                <div>@distributor.Distributor: @distributor.Count</div>
+            }
+        </div>
+        <div style="width: 20%;">
+            <h3>Top 5 Airing Years:</h3>
+            @foreach (var year in ViewBag.Top5Years)
+            {
+                <div>@year.Year: @year.Count</div>
+            }
+        </div>
+        <div style="width: 20%;">
+            <h3>Top 5 Actors:</h3>
+            @foreach (var actor in ViewBag.Top5Actors)
+            {
+                <div>@actor.Actor: @actor.Count</div>
+            }
+        </div>
+    </div>
+</div>
+
+<div class="d-flex flex-wrap justify-content-around">
+    @if (TempData["FailureMessage"] != null)
+    {
+        <div class="alert alert-danger">
+            @TempData["FailureMessage"]
+        </div>
+    }
+    @foreach (var item in Model)
+    {
+        var media = item.Media;
+        var imgSrc = "https://t4.ftcdn.net/jpg/02/51/95/53/360_F_251955356_FAQH0u1y1TZw3ZcdPGybwUkH90a3VAhb.jpg";
+        if (media.ImageData != null && media.ImageMimeType != null)
+        {
+            var base64 = Convert.ToBase64String(media.ImageData);
+            imgSrc = String.Format($"data:{media.ImageMimeType};base64,{base64}");
+        }
+
+        <div class="card mb-4 border-0" style="width: 25rem; background-color: #4f4f4f;">
+            <div class="d-flex flex-column">
+                <a asp-action="Details" asp-route-id="@media.ID" style="flex-grow: 0;">
+                    <img src="@imgSrc" class="card-img-top" style="max-height: 1000px ; height: auto; object-fit: cover;" alt="@media.Title" />
+                </a>
+                <div class="card-body bg-dark text-white d-flex flex-column align-items-center" style="flex-grow: 1;">
+                    <a asp-action="Details" asp-route-id="@media.ID" class="text-white" style="text-decoration: none;">
+                        <h5 class="text-center">@media.Title</h5>
+                    </a>
+                    @{
+                        System.Diagnostics.Debug.WriteLine($"Media ID in View: {media.ID}");
+                    }
+                    <div class="mt-2">
+                        <a class="btn btn-danger" asp-action="RemoveFromWatched" asp-route-mediaId="@media.ID">Remove</a>
+                        <a asp-action="AddToPlanToWatch" asp-route-mediaId="@media.ID" class="btn btn-primary me-2">Plan to watch</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+@Html.PagedListPager(Model, page => Url.Action("Index", new { page }), new PagedListRenderOptions
+{
+    DisplayLinkToFirstPage = PagedListDisplayMode.Never,
+    DisplayLinkToLastPage = PagedListDisplayMode.Never,
+    DisplayLinkToPreviousPage = PagedListDisplayMode.Never,
+    DisplayLinkToNextPage = PagedListDisplayMode.Never,
+    DisplayPageCountAndCurrentLocation = false,
+    MaximumPageNumbersToDisplay = 5,
+    DisplayEllipsesWhenNotShowingAllPageNumbers = true,
+    UlElementClasses = new[] { "pagination justify-content-center" }, // bootstrap classes to center the pagination
+})

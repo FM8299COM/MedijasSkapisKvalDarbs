@@ -126,20 +126,8 @@ namespace MovieScribe.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        // This action returns the "Delete" view for a specific actor, which allows the user to confirm the deletion of the actor.
-        public async Task<IActionResult> Delete(int id)
-        {
-            var actorDetails = await _service.GetByIdAsync(id);
-            if (actorDetails == null)
-            {
-                return View("NotFound");
-            }
-            return View(actorDetails);
-        }
-
-        // This action processes the POST request from the "Delete" view, deleting the specified actor.
-        [HttpPost, ActionName("Delete")]
-        public async Task<IActionResult> DeleteActor(int id)
+        [HttpPost, ActionName("DeleteConfirmed")]
+        public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var actorDetails = await _service.GetByIdAsync(id);
             if (actorDetails == null)

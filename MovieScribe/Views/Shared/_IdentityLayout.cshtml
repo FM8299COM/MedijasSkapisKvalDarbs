@@ -33,14 +33,11 @@ else
                     Recommendations
                 </a>
             </li>
-            @if (User.IsInRole("admin"))
-            {
-                <li>
-                    <a class="dropdown-item" asp-controller="Account" asp-action="Users">
-                        Users
-                    </a>
-                </li>
-            }
+            <li>
+                <a class="dropdown-item" asp-controller="Account" asp-action="UserDetails">
+                    Account
+                </a>
+            </li>
         </ul>
     </div>
     <span style="padding: 5px;"></span>

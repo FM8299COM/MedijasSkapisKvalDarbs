@@ -110,18 +110,8 @@ namespace MovieScribe.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        public async Task<IActionResult> Delete(int id)
-        {
-            var producerDetails = await _service.GetByIdAsync(id);
-            if (producerDetails == null)
-            {
-                return View("NotFound");
-            }
-            return View(producerDetails);
-        }
-
-        [HttpPost, ActionName("Delete")]
-        public async Task<IActionResult> DeleteProducer(int id)
+        [HttpPost, ActionName("DeleteConfirmed")]
+        public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var producerDetails = await _service.GetByIdAsync(id);
             if (producerDetails == null)

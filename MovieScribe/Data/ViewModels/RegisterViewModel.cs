@@ -8,6 +8,9 @@ namespace MovieScribe.Data.ViewModels
         [Required(ErrorMessage = "Username is required")]
         public string UserName { get; set; }
 
+        [Display(Name = "Profile Picture")]
+        public IFormFile? ProfilePicture { get; set; }
+
         [Display(Name = "Email address")]
         [Required(ErrorMessage = "Email address is required")]
         public string EmailAddress { get; set; }

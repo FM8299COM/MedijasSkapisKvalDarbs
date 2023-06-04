@@ -124,18 +124,8 @@ namespace MovieScribe.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        public async Task<IActionResult> Delete(int id)
-        {
-            var distributorDetails = await _service.GetByIdAsync(id);
-            if (distributorDetails == null)
-            {
-                return View("NotFound");
-            }
-            return View(distributorDetails);
-        }
-
-        [HttpPost, ActionName("Delete")]
-        public async Task<IActionResult> DeleteDistributor(int id)
+        [HttpPost, ActionName("DeleteConfirmed")]
+        public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var distributorDetails = await _service.GetByIdAsync(id);
             if (distributorDetails == null)
@@ -147,6 +137,7 @@ namespace MovieScribe.Controllers
 
             return RedirectToAction(nameof(Index));
         }
+
 
         [AllowAnonymous]
         public async Task<IActionResult> Search(string query)

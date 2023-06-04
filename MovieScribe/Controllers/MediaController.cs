@@ -13,7 +13,7 @@ using X.PagedList;
 namespace MovieScribe.Controllers
 {
     // MediaController class for managing media. The [Authorize] attribute is used to restrict access to users with "admin" or "moderator" roles.
-    [Authorize(Roles = "admin, moderator")]
+    [Authorize]
     public class MediaController : Controller
     {
         // Instances of media service, user manager and database context are injected into the controller.
@@ -126,6 +126,7 @@ namespace MovieScribe.Controllers
             return View(mediaDetail);
         }
 
+        [Authorize(Roles = "admin, moderator")]
         // This method returns the create view for creating new media.
         public async Task<IActionResult> Create()
         {
@@ -133,6 +134,7 @@ namespace MovieScribe.Controllers
             return View();
         }
 
+        [Authorize(Roles = "admin, moderator")]
         // This method processes the POST request from the create view. It adds a new media.
         [HttpPost]
         public async Task<IActionResult> Create(MediaViewModel media, IFormFile ImageUpload)
@@ -149,6 +151,7 @@ namespace MovieScribe.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+        [Authorize(Roles = "admin, moderator")]
         // This method returns the edit view for a specific media.
         public async Task<IActionResult> Edit(int id)
         {
@@ -166,6 +169,7 @@ namespace MovieScribe.Controllers
             return View(response);
         }
 
+        [Authorize(Roles = "admin, moderator")]
         // This method processes the POST request from the edit view. It updates a specific media.
         [HttpPost]
         public async Task<IActionResult> Edit(int id, MediaViewModel media, IFormFile ImageUpload)
@@ -187,20 +191,9 @@ namespace MovieScribe.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        // This method returns the delete view for a specific media.
-        public async Task<IActionResult> Delete(int id)
-        {
-            var mediaDetails = await _service.GetMediaByIdAsync(id);
-            if (mediaDetails == null)
-            {
-                return View("NotFound");
-            }
-            return View(mediaDetails);
-        }
-
-        // This method processes the POST request from the delete view. It deletes a specific media.
-        [HttpPost, ActionName("Delete")]
-        public async Task<IActionResult> DeleteMedia(int id)
+        [Authorize(Roles = "admin, moderator")]
+        [HttpPost, ActionName("DeleteConfirmed")]
+        public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var mediaDetails = await _service.GetMediaByIdAsync(id);
             if (mediaDetails == null)
@@ -212,6 +205,7 @@ namespace MovieScribe.Controllers
 
             return RedirectToAction(nameof(Index));
         }
+
 
         // This method adds a media to the user's "Plan To Watch" list. If the media is in the "Watched" list, it is removed from there first.
         public async Task<IActionResult> AddToPlanToWatch(int mediaId)
@@ -262,6 +256,7 @@ namespace MovieScribe.Controllers
             return RedirectToAction(nameof(PlanToWatch));
         }
 
+        [Authorize]
         // This method returns the "Plan To Watch" view for the user, displaying all media in their "Plan To Watch" list.
         public async Task<IActionResult> PlanToWatch(int? page)
         {
@@ -348,6 +343,7 @@ namespace MovieScribe.Controllers
             return RedirectToAction(nameof(Watched));
         }
 
+        [Authorize]
         public async Task<IActionResult> Watched(int? page)
         {
             var userId = _userManager.GetUserId(User);
@@ -425,6 +421,7 @@ namespace MovieScribe.Controllers
             return View(pagedList);
         }
 
+        [Authorize]
         // This method is used to generate media recommendations for the user based on their watched list. 
         public async Task<IActionResult> Recommendations(int? page)
         {

@@ -22,17 +22,27 @@ namespace MovieScribe.Controllers
             _context = context;
         }
 
+        // Asynchronous method to process image upload
         private async Task ProcessImageUploadAsync(IFormFile imageUpload, AppUser user)
         {
+            // Check if an image has been uploaded
             if (imageUpload != null)
             {
+                // Create a memory stream
                 using var memoryStream = new MemoryStream();
+
+                // Asynchronously copy the uploaded file to the memory stream
                 await imageUpload.CopyToAsync(memoryStream);
+
+                // Convert the memory stream data to an array of bytes and assign it to user's ProfilePictureData property
                 user.ProfilePictureData = memoryStream.ToArray();
+
+                // Get the ContentType of the uploaded file (mime type), assign it to user's ProfilePictureMimeType property
                 user.ProfilePictureMimeType = imageUpload.ContentType;
             }
             else
             {
+                // If no file has been uploaded, remove ProfilePicture from ModelState to prevent model validation errors
                 ModelState.Remove("ProfilePicture");
             }
         }
@@ -48,70 +58,115 @@ namespace MovieScribe.Controllers
             return File(user.ProfilePictureData, user.ProfilePictureMimeType);
         }
 
-
-        [Authorize(Roles = "admin, moderator")]
-        public async Task<IActionResult> Users()
+        // This method handles the GET request for the Login page.
+        public IActionResult Login()
         {
-            var users = await _context.Users.ToListAsync();
-            return View(users);
-        }
+            // If the user is already authenticated, redirect them to the Home page.
+            if (User.Identity.IsAuthenticated)
+            {
+                return RedirectToAction("Index", "Home");
+            }
 
-        public IActionResult Login() => View(new LoginViewModel());
+            // If the user is not authenticated, present them with the login form.
+            return View(new LoginViewModel());
+        }
 
         [HttpPost]
         public async Task<IActionResult> Login(LoginViewModel loginViewModel)
         {
+            // Validate the incoming data from the form.
             if (!ModelState.IsValid)
             {
+                // If the model is not valid, return the view with the form and validation messages.
                 return View(loginViewModel);
             }
 
+            // Try to find the user by the entered email.
             var user = await _userManager.FindByEmailAsync(loginViewModel.EmailAddress);
+
+            // If the user exists and the entered password is correct...
             if (user != null && await _userManager.CheckPasswordAsync(user, loginViewModel.Password))
             {
-                var result = await _signInManager.PasswordSignInAsync(user, loginViewModel.Password, false, false);
+                // Sign in the user.
+                var result = await _signInManager.PasswordSignInAsync(user, loginViewModel.Password, isPersistent: false, lockoutOnFailure: false);
+
+                // If the sign-in process was successful, redirect the user to the Home page.
                 if (result.Succeeded)
                 {
                     return RedirectToAction("Index", "Home");
                 }
             }
 
-            TempData["Error"] = "Wrong credentials, try again";
+            // If the sign-in process was not successful, show an error message.
+            TempData["Error"] = "Invalid credentials. Please try again.";
             return View(loginViewModel);
         }
 
-        public IActionResult Register() => View(new RegisterViewModel());
 
-        [HttpPost]
-        public async Task<IActionResult> Register(RegisterViewModel registerVM)
+        // Method that handles registration page request
+        public IActionResult Register()
         {
-            if (!ModelState.IsValid) return View(registerVM);
-
-            var user = await _userManager.FindByEmailAsync(registerVM.EmailAddress) ?? await _userManager.FindByNameAsync(registerVM.UserName);
-            if (user != null)
+            // Check if user is already authenticated
+            if (User.Identity.IsAuthenticated)
             {
-                TempData["Error"] = "This email address or username is already in use";
-                return View(registerVM);
+                // Redirect authenticated user to Home
+                return RedirectToAction("Index", "Home");
             }
 
+            // Create new RegisterViewModel
+            var model = new RegisterViewModel();
+
+            // Render the view with the model
+            return View(model);
+        }
+
+        // Method that handles form submission on registration page
+        [HttpPost]
+        public async Task<IActionResult> Register(RegisterViewModel registerViewModel)
+        {
+            // Check if the data sent in form is valid
+            if (!ModelState.IsValid)
+            {
+                return View(registerViewModel);
+            }
+
+            // Check if the email address or username already exists
+            var existingUser = await _userManager.FindByEmailAsync(registerViewModel.EmailAddress)
+                                ?? await _userManager.FindByNameAsync(registerViewModel.UserName);
+
+            // If the user already exists, send error message
+            if (existingUser != null)
+            {
+                TempData["Error"] = "This email address or username is already taken";
+                return View(registerViewModel);
+            }
+
+            // Create new user
             var newUser = new AppUser()
             {
-                Email = registerVM.EmailAddress,
-                UserName = registerVM.UserName
+                Email = registerViewModel.EmailAddress,
+                UserName = registerViewModel.UserName
             };
 
-            await ProcessImageUploadAsync(registerVM.ProfilePicture, newUser);
+            // Process profile picture upload
+            await ProcessImageUploadAsync(registerViewModel.ProfilePicture, newUser);
 
-            var newUserResponse = await _userManager.CreateAsync(newUser, registerVM.Password);
+            // Create new user in the identity system
+            var createUserResult = await _userManager.CreateAsync(newUser, registerViewModel.Password);
 
-            if (newUserResponse.Succeeded)
+            // If user creation is successful...
+            if (createUserResult.Succeeded)
             {
+                // ...add user to 'User' role and redirect to login
                 await _userManager.AddToRoleAsync(newUser, UserRoles.User);
                 return RedirectToAction("Login", "Account");
             }
-            TempData["Error"] = "Password does not meet basic requirements";
-            return View(registerVM);
+
+            // If user creation failed, show error message
+            TempData["Error"] = "There was an issue with the provided password. Please ensure it meets complexity requirements.";
+            return View(registerViewModel);
         }
+
 
         [HttpPost]
         public async Task<IActionResult> Logout()

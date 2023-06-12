@@ -36,13 +36,12 @@ b {
     padding: 0;
 }
 
-/*This is for description but isnt working at the moment*/
 .truncate {
-    display: inline-block;
+    display: block;
+    width: 950px; /* Adjust this to your desired width */
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    max-width: 250px; /* Adjust this to your needs */
 }
 
 .biography-text {
@@ -60,3 +59,44 @@ b {
     -moz-user-select: none;
     user-select: none;
 }
+
+.pagination-bottom {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background-color: #4f4f4f; /* Replace with your desired background color */
+    padding: 10px;
+    z-index: 9999;
+}
+
+.statistics-row {
+    border-bottom: 3px solid #000; /* Black border at the bottom */
+    background-color: #eee; /* Lighter gray background */
+    padding: 10px;
+    margin-bottom: 20px;
+    color: black;
+}
+
+.flex-container {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.image-container {
+    flex: 1 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    height: 550px; /* Modify as per your design, but ensure that it is same for all cards */
+    background-color: #4f4f4f; /* Or any color you prefer to fill the space around image */
+}
+
+    .image-container img {
+        object-fit: contain;
+        width: 100%; /* Ensures image takes full width of the container */
+        height: auto; /* Ensures image height adjusts as per original aspect ratio */
+    }
+

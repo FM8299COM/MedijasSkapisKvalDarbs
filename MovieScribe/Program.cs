@@ -6,6 +6,9 @@ using MovieScribe.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Get the SendGrid API key from the configuration
+var sendGridApiKey = builder.Configuration.GetValue<string>("SendGrid:ApiKey");
+
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 builder.Services.AddHttpContextAccessor();
@@ -24,12 +27,21 @@ builder.Services.AddIdentity<AppUser, IdentityRole>(options =>
     options.Password.RequireNonAlphanumeric = false;
     options.Password.RequiredLength = 12;
     options.Password.RequiredUniqueChars = 1;
-}).AddEntityFrameworkStores<DBContext>(); 
+
+    options.SignIn.RequireConfirmedAccount = true; 
+
+    options.Tokens.ProviderMap.Add("Default",
+        new TokenProviderDescriptor(typeof(DataProtectorTokenProvider<AppUser>)));
+})
+.AddEntityFrameworkStores<DBContext>()
+.AddDefaultTokenProviders(); 
+
+builder.Services.AddSingleton<IEmailSender>(i =>
+    new SendGridEmailSender(sendGridApiKey, i.GetRequiredService<ILogger<SendGridEmailSender>>()));
 
 builder.Services.AddMemoryCache();
 builder.Services.AddSession();
 builder.Services.AddAuthentication();
-
 
 var app = builder.Build();
 

@@ -90,7 +90,7 @@ namespace MovieScribe.Controllers
         public async Task<IActionResult> Index(int? page)
         {
             var pageNumber = page ?? 1;
-            var pageSize = 9;
+            var pageSize = 8;
 
             var result = (await _service.GetAllAsync(n => n.Studio, m => m.Distributor, o => o.Producer))
                 .ToPagedList(pageNumber, pageSize);
@@ -279,7 +279,7 @@ namespace MovieScribe.Controllers
                 .Where(ptw => ptw.UserId == userId)
                 .ToListAsync();
 
-            int pageSize = 9;  
+            int pageSize = 8;  
             int pageNumber = (page ?? 1);
             var pagedList = planToWatchList.ToPagedList(pageNumber, pageSize);
 
@@ -339,7 +339,7 @@ namespace MovieScribe.Controllers
             System.Diagnostics.Debug.WriteLine($"User ID: {userId}");
             System.Diagnostics.Debug.WriteLine($"watched: {watched}");
 
-            TempData["FailureMessage"] = "Unable to remove media from Watched list.";
+            TempData["FailureMessage"] = "Nevar noņemt multividi no skatītais saraksta.";
             return RedirectToAction(nameof(Watched));
         }
 
@@ -363,7 +363,7 @@ namespace MovieScribe.Controllers
                 .Where(ptw => ptw.UserId == userId)
                 .ToListAsync();
 
-            int pageSize = 9;  
+            int pageSize = 8;  
             int pageNumber = (page ?? 1);
             var pagedList = watchedList.ToPagedList(pageNumber, pageSize);
 
@@ -405,8 +405,7 @@ namespace MovieScribe.Controllers
                 .Select(group => new { Actor = group.Key, Count = group.Count() })
                 .ToList();
 
-            var averageRuntime = watchedList.Any() ? watchedList.Average(ptw => ptw.Media.Runtime) : 0;
-
+            var averageRuntime = watchedList.Any() ? Math.Round(watchedList.Average(ptw => ptw.Media.Runtime)) : 0;
 
             ViewBag.TotalRuntime = totalRuntime;
             ViewBag.Top5Genres = top5Genres;
@@ -415,8 +414,6 @@ namespace MovieScribe.Controllers
             ViewBag.Top5Years = top5Years;
             ViewBag.Top5Actors = top5Actors;
             ViewBag.AverageRuntime = averageRuntime;
-
-
 
             return View(pagedList);
         }
@@ -634,13 +631,13 @@ namespace MovieScribe.Controllers
             var top3Recommendations = await GetTop3RecommendedFilms();
 
             // Initializes an instance of StringBuilder to construct HTML content.
-            StringBuilder htmlContent = new StringBuilder("<h1>Your statistics and top 3 recommendations</h1>");
+            StringBuilder htmlContent = new StringBuilder("<h1>Tava statistika un rekomendācijas</h1>");
 
             // Appends the total runtime to the HTML content.
-            htmlContent.Append($"<p>Total runtime: {totalRuntime} minutes</p>");
+            htmlContent.Append($"<p>Patērētais laiks: {totalRuntime} minutes</p>");
 
             // Appends a list of top 5 genres to the HTML content.
-            htmlContent.Append("<p>Top genres:</p>");
+            htmlContent.Append("<p>Top žanri:</p>");
             htmlContent.Append("<ul>");
             foreach (var genre in top5Genres)
             {
@@ -649,7 +646,7 @@ namespace MovieScribe.Controllers
             htmlContent.Append("</ul>");
 
             // Appends a list of top 5 actors to the HTML content.
-            htmlContent.Append("<p>Top actors:</p>");
+            htmlContent.Append("<p>Top aktieri:</p>");
             htmlContent.Append("<ul>");
             foreach (var actor in top5Actors)
             {
@@ -658,7 +655,7 @@ namespace MovieScribe.Controllers
             htmlContent.Append("</ul>");
 
             // Appends a list of top 3 recommended films to the HTML content.
-            htmlContent.Append("<p>Top recommendations:</p>");
+            htmlContent.Append("<p>Top rekomendācijas:</p>");
             htmlContent.Append("<ul>");
             foreach (var film in top3Recommendations)
             {
@@ -667,7 +664,7 @@ namespace MovieScribe.Controllers
             htmlContent.Append("</ul>");
 
             // Appends a thank you note to the HTML content.
-            htmlContent.Append("Thank you for using our site!");
+            htmlContent.Append("Paldies, ka izmantojāt mūsējo saiti");
 
             // Converts the HTML content to a PDF document using IronPdf.
             var renderer = new IronPdf.HtmlToPdf();
@@ -693,11 +690,11 @@ namespace MovieScribe.Controllers
             var top5Genres = await GetTop5GenresPlanToWatch();
             var top5Actors = await GetTop5ActorsPlanToWatch();
 
-            StringBuilder htmlContent = new StringBuilder("<h1>Your Plan to Watch statistics</h1>");
+            StringBuilder htmlContent = new StringBuilder("<h1>Tava plānotā skatīties apraksts un statistika</h1>");
 
-            htmlContent.Append($"<p>Total runtime: {totalRuntime} minutes</p>");
+            htmlContent.Append($"<p>Patērētais laiks: {totalRuntime} minutes</p>");
 
-            htmlContent.Append("<p>Top genres:</p>");
+            htmlContent.Append("<p>Top žanri:</p>");
             htmlContent.Append("<ul>");
             foreach (var genre in top5Genres)
             {
@@ -705,7 +702,7 @@ namespace MovieScribe.Controllers
             }
             htmlContent.Append("</ul>");
 
-            htmlContent.Append("Thank you for using our site!");
+            htmlContent.Append("Paldies, ka izmantojāt mūsējo saiti");
 
             var renderer = new IronPdf.HtmlToPdf();
             var pdf = renderer.RenderHtmlAsPdf(htmlContent.ToString());
@@ -719,9 +716,6 @@ namespace MovieScribe.Controllers
                 FileDownloadName = "PlanToWatchReport.pdf"
             };
             return response;
-        }
-
-
-
+        }    
     }
 }

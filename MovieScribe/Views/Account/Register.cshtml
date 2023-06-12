@@ -16,13 +16,13 @@
 
                     <div class="card-body p-5 text-center">
                         <div class="mb-md-5 mt-md-4 pb-5">
-                            <h2 class="fw-bold mb-2 text-uppercase" style="margin-bottom: 5px">Sign up for a new account</h2>
+                            <h2 class="fw-bold mb-2 text-uppercase" style="margin-bottom: 5px">Reģistrējaties jaunam kontam</h2>
 
                             <form asp-action="Register" enctype="multipart/form-data">
                                 <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
                                 <div class="form-outline form-white mb-4">
-                                    <input asp-for="UserName" class="form-control form-control-lg" placeholder="Username" />
+                                    <input asp-for="UserName" class="form-control form-control-lg" placeholder="Lietotājvārds" />
                                     <span asp-validation-for="UserName" class="text-danger"></span>
                                 </div>
 
@@ -31,21 +31,21 @@
                                 </div>
 
                                 <div class="form-outline form-white mb-4">
-                                    <input asp-for="EmailAddress" id="typeEmailX" class="form-control form-control-lg" placeholder="Email address" />
+                                    <input asp-for="EmailAddress" id="typeEmailX" class="form-control form-control-lg" placeholder="E-pasta adrese" />
                                     <span asp-validation-for="EmailAddress" class="text-danger"></span>
                                 </div>
 
                                 <div class="form-outline form-white mb-4">
-                                    <input asp-for="Password" id="typePasswordX" class="form-control form-control-lg" placeholder="Password" />
+                                    <input asp-for="Password" id="typePasswordX" class="form-control form-control-lg" placeholder="Parole" />
                                     <span asp-validation-for="Password" class="text-danger"></span>
                                 </div>
 
                                 <div class="form-outline form-white mb-4">
-                                    <input asp-for="ConfirmPassword" id="typeConfirmPasswordX" class="form-control form-control-lg" placeholder="Confirm password" />
+                                    <input asp-for="ConfirmPassword" id="typeConfirmPasswordX" class="form-control form-control-lg" placeholder="Apstiprini paroli" />
                                     <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
                                 </div>
 
-                                <input class="btn btn-outline-light btn-lg px-5" type="submit" value="Sign up" />
+                                <input class="btn btn-outline-light btn-lg px-5" type="submit" value="Reģistrēties" />
                             </form>
                         </div>
                     </div>

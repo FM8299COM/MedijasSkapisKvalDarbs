@@ -4,19 +4,19 @@ namespace MovieScribe.Data.ViewModels
 {
     public class ChangePasswordViewModel
     {
-        [Required]
+        [Required(ErrorMessage = "Pašreizējā parole ir nepieciešams lauks")]
         [DataType(DataType.Password)]
         [Display(Name = "Current password")]
         public string CurrentPassword { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "Jaunā parole ir nepieciešams lauks")]
         [DataType(DataType.Password)]
         [Display(Name = "New password")]
         public string NewPassword { get; set; }
 
         [DataType(DataType.Password)]
-        [Display(Name = "Confirm new password")]
-        [Compare("NewPassword", ErrorMessage = "The new password and confirmation password do not match.")]
+        [Display(Name = "Apstiprini jauno paroli")]
+        [Compare("NewPassword", ErrorMessage = "Jaunā un vecā parole sakrīt")]
         public string ConfirmPassword { get; set; }
     }
 }

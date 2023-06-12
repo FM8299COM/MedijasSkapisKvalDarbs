@@ -8,27 +8,29 @@
                 <div class="card bg-dark text-white" style="border-radius: 1rem;">
                     <div class="card-body p-5 text-center">
                         <div class="mb-md-5 mt-md-4 pb-5">
-                            <h2 class="fw-bold mb-2 text-uppercase">Add Media</h2>
+                            <h2 class="fw-bold mb-2 text-uppercase">Rediģēt detalizētu informāciju par mēdiju</h2>
                             <form asp-action="Edit" method="post" enctype="multipart/form-data">
                                 <div asp-validation-summary="ModelOnly" class="text-danger"></div>
                                 
                                 <div class="form-outline form-white mb-3">
-                                    <input asp-for="Title" class="form-control form-control-md" placeholder="Title" />
+                                    <input asp-for="Title" class="form-control form-control-md" placeholder="Nosaukums" />
                                     <span asp-validation-for="Title" class="text-danger"></span>
                                 </div>
                                 
                                 <div class="form-outline form-white mb-3">
-                                    <input asp-for="Runtime" class="form-control form-control-md" placeholder="Runtime" type="number" />
+                                    <input asp-for="Runtime" class="form-control form-control-md" placeholder="Garums" type="number" />
                                     <span asp-validation-for="Runtime" class="text-danger"></span>
                                 </div>
-                                
+                                <div class="shadow p-2 mb-2 rounded">
+                                    <p>Example: https://www.youtube.com/embed/eVi3MOVPxWI</p>
+                                </div>
                                 <div class="form-outline form-white mb-3">
-                                    <input asp-for="YouTubeLink" class="form-control form-control-md" placeholder="YouTube Link" />
+                                    <input asp-for="YouTubeLink" class="form-control form-control-md" placeholder="YouTube saita" />
                                     <span asp-validation-for="YouTubeLink" class="text-danger"></span>
                                 </div>
                                 
                                 <div class="form-outline form-white mb-3">
-                                    <input asp-for="Aired" class="form-control form-control-md" placeholder="Aired" type="date" />
+                                    <input asp-for="Aired" class="form-control form-control-md" placeholder="Datums" type="date" />
                                     <span asp-validation-for="Aired" class="text-danger"></span>
                                 </div>
                                 
@@ -71,7 +73,7 @@
                                     </div>
                                 </div>
                                 <div class="form-outline form-white mb-3">
-                                    <textarea asp-for="Description" class="form-control form-control-md" placeholder="Description"></textarea>
+                                    <textarea asp-for="Description" class="form-control form-control-md" placeholder="Apraksts"></textarea>
                                     <span asp-validation-for="Description" class="text-danger"></span>
                                 </div>
 

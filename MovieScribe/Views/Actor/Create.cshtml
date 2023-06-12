@@ -8,29 +8,29 @@
                     <div class="card-body p-5 text-center">
 
                         <div class="mb-md-5 mt-md-4 pb-5">
-                            <h2 class="fw-bold mb-2 text-uppercase">Add a New Actor</h2>
+                            <h2 class="fw-bold mb-2 text-uppercase">Pievienot jaunu aktieri</h2>
 
                             <form asp-action="Create" method="post" enctype="multipart/form-data">
                                 <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
                                 <div class="form-outline form-white mb-3">
-                                    <input asp-for="Name" class="form-control form-control-md" placeholder="Name" />
+                                    <input asp-for="Name" class="form-control form-control-md" placeholder="Vārds" />
                                     <span asp-validation-for="Name" class="text-danger"></span>
                                 </div>
                                 <div class="form-outline form-white mb-3">
-                                    <input asp-for="Middle_Name" class="form-control form-control-md" placeholder="Middle Name" />
+                                    <input asp-for="Middle_Name" class="form-control form-control-md" placeholder="Otrais vārds" />
                                     <span asp-validation-for="Middle_Name" class="text-danger"></span>
                                 </div>
                                 <div class="form-outline form-white mb-3">
-                                    <input asp-for="Surname" class="form-control form-control-md" placeholder="Surname" />
+                                    <input asp-for="Surname" class="form-control form-control-md" placeholder="Uzvārds" />
                                     <span asp-validation-for="Surname" class="text-danger"></span>
                                 </div>
                                 <div class="form-outline form-white mb-3">
-                                    <input asp-for="Age" class="form-control form-control-md" placeholder="Age" type="number" />
+                                    <input asp-for="Age" class="form-control form-control-md" placeholder="Vecums" type="number" />
                                     <span asp-validation-for="Age" class="text-danger"></span>
                                 </div>
                                 <div class="form-outline form-white mb-3">
-                                    <input asp-for="Biography" class="form-control form-control-md" placeholder="Biography" />
+                                    <input asp-for="Biography" class="form-control form-control-md" placeholder="Biogrāfija" />
                                     <span asp-validation-for="Biography" class="text-danger"></span>
                                 </div>
                                 <div class="form-outline form-white mb-3">
@@ -39,7 +39,7 @@
                                 </div>
 
                                 <div class="d-flex justify-content-between">
-                                    <input type="submit" value="Create" class="btn btn-outline-light btn-lg px-5" />
+                                    <input type="submit" value="Pievienot" class="btn btn-outline-light btn-lg px-5" />
                                 </div>
                             </form>
 

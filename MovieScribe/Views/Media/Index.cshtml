@@ -5,7 +5,7 @@
 
 @if (User.IsInRole("admin") || User.IsInRole("moderator"))
 {
-    <a asp-controller="Media" asp-action="Create" class="btn btn-success">Add New</a>
+    <a asp-controller="Media" asp-action="Create" class="btn btn-success">Pievienot jaunu ierakstu</a>
 }
 <div class="d-flex flex-wrap justify-content-around">
     @if (TempData["FailureMessage"] != null)
@@ -23,10 +23,12 @@
             imgSrc = String.Format($"data:{item.ImageMimeType};base64,{base64}");
         }
 
-        <div class="card mb-4 border-0" style="width: 25rem; background-color: #4f4f4f;">
+        <div class="card mb-4 border-0 flex-container" style="width: 25rem; background-color: #4f4f4f;">
             <div class="d-flex flex-column">
                 <a asp-action="Details" asp-route-id="@item.ID" style="flex-grow: 0;">
-                    <img src="@imgSrc" class="card-img-top" style="max-height: 1000px ; height: auto; object-fit: cover;" alt="@item.Title" />
+                    <div class="image-container">
+                        <img src="@imgSrc" class="card-img-top img-fluid" alt="@item.Title" />
+                    </div>
                 </a>
                 <div class="card-body bg-dark text-white d-flex flex-column align-items-center" style="flex-grow: 1;">
                     <a asp-action="Details" asp-route-id="@item.ID" class="text-white" style="text-decoration: none;">
@@ -47,5 +49,7 @@
     DisplayPageCountAndCurrentLocation = false,
     MaximumPageNumbersToDisplay = 5,
     DisplayEllipsesWhenNotShowingAllPageNumbers = true,
-    UlElementClasses = new[] { "pagination justify-content-center" }, // bootstrap classes to center the pagination
+    UlElementClasses = new[] { "pagination" },
+        LiElementClasses = new[] { "page-item" },
+        PageClasses = new[] { "page-link" },
 })

@@ -16,33 +16,37 @@
 
             @if (Model.YouTubeLink != null)
             {
-                <button id="toggleVideo" class="btn btn-primary" style="margin-bottom: 5px; margin-top: 5px">Trailer</button>
+                <div class="card-body">
+                    <button class="btn btn-info btn-block" type="button" data-bs-toggle="collapse" data-bs-target="#ytVideo" aria-expanded="false" aria-controls="ytVideo">
+                        Treileris ↓
+                    </button>
 
-                <div id="ytVideo" class="embed-responsive embed-responsive-16by9" style="margin-bottom: 15px; display: none; width: 100%;">
-                    <iframe class="embed-responsive-item" src="@Model.YouTubeLink" style="width: 100%; height: 500px;" allowfullscreen></iframe>
+                    <div id="ytVideo" class="embed-responsive embed-responsive-16by9 collapse" style="margin-top: 10px; width: 100%;">
+                        <iframe class="embed-responsive-item" src="@Model.YouTubeLink" style="width: 100%; height: 500px;" allowfullscreen></iframe>
+                    </div>
                 </div>
+
             }
 
 
             <div class="card-body">
                 <p class="card-text">
-                    <!--This is for description, but desnt work yet -->
-                    <b>Description:</b>
+                    <b>Apraksts:</b>
                     <div class="badge badge-pill badge-custom" style="font-size: 1.2em;">
-                        <span id="short-description" class="truncate" style="text-decoration: none;"> @Model.Description </span>
-                        <span id="full-description" style="text-decoration: none; display: none;"> @Model.Description </span>
+                        <span id="short-description" class="truncate">@Model.Description</span>
+                        <span id="full-description" style="display: none;">@Model.Description</span>
                     </div>
-                    <button id="toggle-description" type="button">Show More</button>
+                    <button id="toggle-description" type="button">Rādīt vēl</button>
                 </p>
-
             </div>
+
+
             <div class="col-md-12">
                 <div class="card-footer">
                     <div class="row">
                         <div class="col-md-6">
-                            <!-- First column -->
                             <p class="card-text">
-                                <b>Title:</b>
+                                <b>Nosaukums:</b>
                                 <div class="badge badge-pill badge-custom" style="font-size: 1.2em;">
                                     <a> @Model.Title </a>
                                 </div>
@@ -50,7 +54,7 @@
                             @if (Model.Aired != null)
                             {
                                 <p class="card-text">
-                                    <b>Time:</b>
+                                    <b>Garums:</b>
                                     <div class="badge badge-pill badge-custom" style="font-size: 1.2em;">
                                         <a> @Model.Runtime minūtes | @Model.Aired?.ToString("yyyy'-'MM'-'dd") </a>
                                     </div>
@@ -59,7 +63,7 @@
                             else
                             {
                                 <p class="card-text">
-                                    <b>Time:</b>
+                                    <b>Garums:</b>
                                     <div class="badge badge-pill badge-custom" style="font-size: 1.2em;">
                                         <a> @Model.Runtime minūtes</a>
                                     </div>
@@ -75,7 +79,7 @@
                                 }
                             </p>
                             <p class="card-text">
-                                <b>Type:</b>
+                                <b>Veids:</b>
                                 <div class="badge badge-pill badge-custom" style="font-size: 1.2em;">
                                     @Model.Type
                                 </div>
@@ -101,7 +105,6 @@
                         </div>
 
                         <div class="col-md-6">
-                            <!-- Second column -->
                             <p class="card-text">
                                 <b>Rakstnieki:</b>
                                 @foreach (var writers in Model.Writer_SUB_Media)
@@ -112,7 +115,7 @@
                                 }
                             </p>
                             <p class="card-text">
-                                <b>Actors:</b>
+                                <b>Aktieri:</b>
                                 @foreach (var actor in Model.Actor_SUB_Media)
                                 {
                                     <div class="badge badge-pill badge-custom" style="font-size: 1.2em; margin-top: 5px;">
@@ -121,7 +124,7 @@
                                 }
                             </p>
                             <p class="card-text">
-                                <b>Genres:</b>
+                                <b>Žanri:</b>
                                 @foreach (var genre in Model.Genre_SUB_Media)
                                 {
                                     <div class="badge badge-pill badge-custom" style="font-size: 1.2em; margin-top: 5px;">
@@ -130,13 +133,13 @@
                                 }
                             </p>
                             <p class="card-text">
-                                <b>Actions:</b>
+                                <b>Vadība:</b>
                                 @if (User.Identity.IsAuthenticated)
                                 {
-                                    <a asp-action="AddToPlanToWatch" asp-route-mediaId="@Model.ID" class="btn btn-primary">PTW</a>
-                                    <a asp-action="AddToWatched" asp-route-mediaId="@Model.ID" class="btn btn-primary">Watched</a>
+                                    <a asp-action="AddToPlanToWatch" asp-route-mediaId="@Model.ID" class="btn btn-primary">Plānots skatīties</a>
+                                    <a asp-action="AddToWatched" asp-route-mediaId="@Model.ID" class="btn btn-primary">Skatīts</a>
                                 }
-                                <a class="btn btn-secondary" asp-action="Index">Back to list</a>
+                                <a class="btn btn-secondary" asp-action="Index">Atpakaļ</a>
                             </p>
                             <p class="card-text">
                                 @if (User.Identity.IsAuthenticated && User.IsInRole("admin") || User.IsInRole("moderator"))
@@ -163,34 +166,25 @@
 @section Scripts {
     <script>
         document.addEventListener("DOMContentLoaded", function () {
-            // Toggle for video
-            document.getElementById("toggleVideo").addEventListener("click", function () {
-                var video = document.getElementById("ytVideo");
-                if (video.style.display === "none") {
-                    video.style.display = "block";
-                } else {
-                    video.style.display = "none";
-                }
-            });
-
-            // Toggle for description BUT DOESNT WORK AT THE MOMENT
             var shortDescription = document.getElementById("short-description");
             var fullDescription = document.getElementById("full-description");
             var toggleButton = document.getElementById("toggle-description");
 
+            shortDescription.style.display = "block";
+            fullDescription.style.display = "none";
+            toggleButton.textContent = "Show More";
+
             toggleButton.addEventListener("click", function () {
                 if (shortDescription.style.display !== "none") {
                     shortDescription.style.display = "none";
-                    fullDescription.style.display = "inline";
+                    fullDescription.style.display = "block";
                     toggleButton.textContent = "Show Less";
                 } else {
-                    shortDescription.style.display = "inline";
+                    shortDescription.style.display = "block";
                     fullDescription.style.display = "none";
-                    toggleButton.textContent = "Show More";
+                    toggleButton.textContent = "Rādīt vēl";
                 }
             });
         });
-
-        prepareDeleteButtons('delete-media-btn', 'confirm-delete-media-btn');
     </script>
 }

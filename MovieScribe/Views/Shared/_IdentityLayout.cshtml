@@ -3,11 +3,11 @@
 @if (!User.Identity.IsAuthenticated)
 {
     <a class="btn btn-success my-2 my-sm-0" asp-controller="Account" asp-action="Login">
-        Log in
+        Autorizēties
     </a>
     <span style="padding: 5px;"></span>
     <a class="btn btn-success my-2 my-sm-0" asp-controller="Account" asp-action="Register">
-        Register
+        Reģistrēties
     </a>
 }
 else
@@ -15,27 +15,27 @@ else
     <div class="dropdown">
         <button class="btn btn-success dropdown-toggle" type="button" id="profile-btn" data-bs-toggle="dropdown"
                 aria-expanded="false">
-            Actions
+            Darbības
         </button>
         <ul class="dropdown-menu" aria-labelledby="profile-btn">
             <li>
                 <a class="dropdown-item" asp-controller="Media" asp-action="PlanToWatch">
-                    PTW
+                    Plānots skatīties
                 </a>
             </li>
             <li>
                 <a class="dropdown-item" asp-controller="Media" asp-action="Watched">
-                    Watched
+                    Skatīts
                 </a>
             </li>
             <li>
                 <a class="dropdown-item" asp-controller="Media" asp-action="Recommendations">
-                    Recommendations
+                    Rekomendācijas
                 </a>
             </li>
             <li>
                 <a class="dropdown-item" asp-controller="Account" asp-action="UserDetails">
-                    Account
+                    Konts
                 </a>
             </li>
         </ul>
@@ -43,7 +43,7 @@ else
     <span style="padding: 5px;"></span>
     <form asp-controller="Account" asp-action="Logout">
         <button class="btn btn-danger my-2 my-sm-0">
-            Log out
+            Sesijas pārtraukšana
         </button>
     </form>
 }

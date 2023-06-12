@@ -8,7 +8,7 @@
                     <div class="card-body p-5 text-center">
 
                         <div class="mb-md-5 mt-md-4 pb-5">
-                            <h2 class="fw-bold mb-2 text-uppercase">Edit a Studio Details</h2>
+                            <h2 class="fw-bold mb-2 text-uppercase">Rediģēt detalizētu informāciju par studiju</h2>
 
                             @if (Model.ImageData != null)
                             {
@@ -25,12 +25,12 @@
                                 <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
                                 <div class="form-outline form-white mb-3">
-                                    <input asp-for="Name" class="form-control form-control-md" placeholder="Name" />
+                                    <input asp-for="Name" class="form-control form-control-md" placeholder="Vārds" />
                                     <span asp-validation-for="Name" class="text-danger"></span>
                                 </div>
 
                                 <div class="form-outline form-white mb-3">
-                                    <input asp-for="Description" class="form-control form-control-md" placeholder="Description" />
+                                    <input asp-for="Description" class="form-control form-control-md" placeholder="Apraksts" />
                                     <span asp-validation-for="Description" class="text-danger"></span>
                                 </div>
 
@@ -40,8 +40,7 @@
                                 </div>
 
                                 <div class="d-flex justify-content-between">
-                                    <input class="btn btn-outline-light btn-md px-5" type="submit" value="Update" />
-                                    <a class="btn btn-outline-secondary" asp-action="Index">Show All</a>
+                                    <input class="btn btn-outline-light btn-md px-5" type="submit" value="Rediģēt" />
                                 </div>
                             </form>
                         </div>

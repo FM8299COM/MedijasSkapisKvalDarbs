@@ -3,7 +3,13 @@
 @using X.PagedList.Web.Common;
 @model IPagedList<WatchedModel>
 
-<div class="row">
+<div style="text-align: right;">
+    <button class="btn btn-info" style="margin-bottom: 10px" type="button" data-bs-toggle="collapse" data-bs-target="#statisticsDiv" aria-expanded="false" aria-controls="statisticsDiv">
+        Parādīt statistiku
+    </button>
+</div>
+
+<div class="row statistics-row collapse" id="statisticsDiv" style="margin-top: 10px">
     @if (TempData["FailureMessage"] != null)
     {
         <div class="alert alert-danger">
@@ -11,49 +17,34 @@
         </div>
     }
     <div>
-        <a class="btn btn-success" asp-action="GenerateReport"><i class="bi bi-file-earmark-text"></i> Generate Report</a>
+        <a class="btn btn-success" asp-action="GenerateReport"><i class="bi bi-file-earmark-text"></i> Ģenerēt pārskatu</a>
     </div>
-    <div style="display: flex; flex-wrap: wrap; justify-content: space-between; margin-bottom: 10px">
-        <div style="width: 20%;">
-            <h3>Total Runtime: @ViewBag.TotalRuntime minutes</h3>
+    <div style="display: flex; flex-wrap: wrap; justify-content: space-between; margin-bottom: 10px; width: 120%;">
+        <div style="width: 20%; display: flex; flex-direction: column; align-items: center;">
+            <h3>Kopējais izpildlaiks: @ViewBag.TotalRuntime minutes</h3>
         </div>
-        <div style="width: 20%;">
-            <h3>Average Runtime: @ViewBag.averageRuntime minutes</h3>
+        <div style="width: 20%; display: flex; flex-direction: column; align-items: center;">
+            <h3>Vidējais izpildlaiks: @ViewBag.averageRuntime minutes</h3>
         </div>
-        <div style="width: 20%;">
-            <h3>Top 5 Genres:</h3>
-            @foreach (var genre in ViewBag.Top5Genres)
-            {
-                <div>@genre.Genre: @genre.Count</div>
-            }
+        <div style="width: 20%; display: flex; flex-direction: column; align-items: center;">
+            <h3>Top 5 aktieri:</h3>
+            <svg id="bar-chart-actors" width="400" height="300"></svg>
         </div>
-        <div style="width: 20%;">
-            <h3>Top 5 Media Types:</h3>
-            @foreach (var mediaType in ViewBag.Top5MediaTypes)
-            {
-                <div>@mediaType.Type: @mediaType.Count</div>
-            }
+        <div style="width: 20%; display: flex; flex-direction: column; align-items: center;">
+            <h3>Top 5 žanri:</h3>
+            <svg id="bar-chart-genres" width="400" height="300"></svg>
         </div>
-        <div style="width: 20%;">
-            <h3>Top 3 Distributors:</h3>
-            @foreach (var distributor in ViewBag.Top3Distributors)
-            {
-                <div>@distributor.Distributor: @distributor.Count</div>
-            }
+        <div style="width: 20%; display: flex; flex-direction: column; align-items: center;">
+            <h3>Top 5 izlaiduma gadi:</h3>
+            <svg id="bar-chart-airing-years" width="400" height="300"></svg>
         </div>
-        <div style="width: 20%;">
-            <h3>Top 5 Airing Years:</h3>
-            @foreach (var year in ViewBag.Top5Years)
-            {
-                <div>@year.Year: @year.Count</div>
-            }
+        <div style="width: 20%; display: flex; flex-direction: column; align-items: center;">
+            <h3>Top 5 mēdijas veidi:</h3>
+            <svg id="bar-chart-media-types" width="400" height="300"></svg>
         </div>
-        <div style="width: 20%;">
-            <h3>Top 5 Actors:</h3>
-            @foreach (var actor in ViewBag.Top5Actors)
-            {
-                <div>@actor.Actor: @actor.Count</div>
-            }
+        <div style="width: 20%; display: flex; flex-direction: column; align-items: center;">
+            <h3>Top 3 izplatītāji:</h3>
+            <svg id="bar-chart-distributors" width="400" height="300"></svg>
         </div>
     </div>
 </div>
@@ -75,10 +66,12 @@
             imgSrc = String.Format($"data:{media.ImageMimeType};base64,{base64}");
         }
 
-        <div class="card mb-4 border-0" style="width: 25rem; background-color: #4f4f4f;">
+        <div class="card mb-4 border-0 flex-container" style="width: 25rem; background-color: #4f4f4f;">
             <div class="d-flex flex-column">
                 <a asp-action="Details" asp-route-id="@media.ID" style="flex-grow: 0;">
-                    <img src="@imgSrc" class="card-img-top" style="max-height: 1000px ; height: auto; object-fit: cover;" alt="@media.Title" />
+                    <div class="image-container">
+                        <img src="@imgSrc" class="card-img-top img-fluid" alt="@media.Title" />
+                    </div>
                 </a>
                 <div class="card-body bg-dark text-white d-flex flex-column align-items-center" style="flex-grow: 1;">
                     <a asp-action="Details" asp-route-id="@media.ID" class="text-white" style="text-decoration: none;">
@@ -88,12 +81,13 @@
                         System.Diagnostics.Debug.WriteLine($"Media ID in View: {media.ID}");
                     }
                     <div class="mt-2">
-                        <a class="btn btn-danger" asp-action="RemoveFromWatched" asp-route-mediaId="@media.ID">Remove</a>
-                        <a asp-action="AddToPlanToWatch" asp-route-mediaId="@media.ID" class="btn btn-primary me-2">Plan to watch</a>
+                        <a class="btn btn-danger" asp-action="RemoveFromWatched" asp-route-mediaId="@media.ID">Dzēst</a>
+                        <a asp-action="AddToPlanToWatch" asp-route-mediaId="@media.ID" class="btn btn-primary me-2">Plānots skatīties</a>
                     </div>
                 </div>
             </div>
         </div>
+
     }
 </div>
 @Html.PagedListPager(Model, page => Url.Action("Index", new { page }), new PagedListRenderOptions
@@ -105,5 +99,91 @@
     DisplayPageCountAndCurrentLocation = false,
     MaximumPageNumbersToDisplay = 5,
     DisplayEllipsesWhenNotShowingAllPageNumbers = true,
-    UlElementClasses = new[] { "pagination justify-content-center" }, // bootstrap classes to center the pagination
+    UlElementClasses = new[] { "pagination" },
+        LiElementClasses = new[] { "page-item" },
+        PageClasses = new[] { "page-link" },
 })
+
+@section Scripts{
+    <script src="https://d3js.org/d3.v5.min.js"></script>
+
+    <script type="text/javascript">
+        var MediaType = {
+            0: 'Film',
+            1: 'Series',
+        };
+
+        function getEnumKeyByValue(object, value) {
+            return object[value];
+        }
+
+        function createBarChart(data, svgId, yAxisLabel, xAxisLabel, property) {
+            var svg = d3.select('#' + svgId),
+                margin = { top: 20, right: 20, bottom: 30, left: 200 }, 
+                width = +svg.attr("width") - margin.left - margin.right,
+                height = +svg.attr("height") - margin.top - margin.bottom;
+
+            var x = d3.scaleLinear().range([0, width]),
+                y = d3.scaleBand().range([height, 0]).padding(0.1);
+
+            var color = d3.scaleOrdinal(d3.schemeCategory10);
+
+            var g = svg.append("g")
+                .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+            x.domain([0, d3.max(data, function (d) { return d.count; })]);
+            y.domain(data.map(function (d) { return d[property]; })).padding(0.1);
+
+            g.append("g")
+                .attr("transform", "translate(0," + height + ")")
+                .call(d3.axisBottom(x).ticks(d3.max(data, function (d) { return d.count; })).tickFormat(d3.format("d")));
+
+            g.append("g")
+                .call(d3.axisLeft(y))
+                .append("text")
+                .attr("class", "axis-label")
+                .attr("y", -80) 
+                .attr("x", -height / 2)
+                .attr("text-anchor", "middle")
+                .attr("transform", "rotate(-90)")
+                .text(yAxisLabel);
+
+            g.selectAll(".bar")
+                .data(data)
+                .enter().append("rect")
+                .attr("class", "bar")
+                .attr("x", 0)
+                .attr("y", function (d) { return y(d[property]); })
+                .attr("width", function (d) { return x(d.count); })
+                .attr("height", y.bandwidth())
+                .style("fill", function (d, i) { return color(i); });
+        }
+
+        $(document).ready(function () {
+            var top5Genres = @Html.Raw(Json.Serialize(ViewBag.Top5Genres));
+            console.log(top5Genres)
+
+            var top5MediaTypes = @Html.Raw(Json.Serialize(ViewBag.Top5MediaTypes));
+            top5MediaTypes.forEach(mediaType => {
+                mediaType.type = getEnumKeyByValue(MediaType, mediaType.type);
+            });
+            console.log(top5MediaTypes)
+            var top3Distributors = @Html.Raw(Json.Serialize(ViewBag.Top3Distributors));
+            console.log(top3Distributors)
+
+            var top5AiringYears = @Html.Raw(Json.Serialize(ViewBag.Top5Years));
+            console.log(top5AiringYears)
+
+            var top5Actors = @Html.Raw(Json.Serialize(ViewBag.Top5Actors));
+            console.log(top5Actors)
+
+
+            createBarChart(top5Genres, "bar-chart-genres", "Genres", "Count", "genre");
+            createBarChart(top5MediaTypes, "bar-chart-media-types", "Media Types", "Count", "type");
+            createBarChart(top3Distributors, "bar-chart-distributors", "Distributors", "Count", "distributor");
+            createBarChart(top5AiringYears, "bar-chart-airing-years", "Years", "Count", "year");
+            createBarChart(top5Actors, "bar-chart-actors", "Actors", "Count", "actor");
+        });
+    </script>
+}
+

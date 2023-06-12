@@ -1,12 +1,15 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.EntityFrameworkCore;
 using MovieScribe.Data;
 using MovieScribe.Data.Static;
 using MovieScribe.Data.ViewModels;
 using MovieScribe.Models;
 using System.Data;
+using System.Text.Encodings.Web;
+using System.Text;
 
 namespace MovieScribe.Controllers
 {
@@ -15,11 +18,16 @@ namespace MovieScribe.Controllers
         private readonly UserManager<AppUser> _userManager;
         private readonly SignInManager<AppUser> _signInManager;
         private readonly DBContext _context;
-        public AccountController(UserManager<AppUser> userManager, SignInManager<AppUser> signInManager, DBContext context)
+        private readonly IEmailSender _emailSender;
+        private readonly ILogger<AccountController> _logger;
+
+        public AccountController(UserManager<AppUser> userManager, SignInManager<AppUser> signInManager, DBContext context, IEmailSender emailSender, ILogger<AccountController> logger)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _context = context;
+            _emailSender = emailSender;
+            _logger = logger;
         }
 
         // Asynchronous method to process image upload
@@ -87,6 +95,13 @@ namespace MovieScribe.Controllers
             // If the user exists and the entered password is correct...
             if (user != null && await _userManager.CheckPasswordAsync(user, loginViewModel.Password))
             {
+                if (!user.EmailConfirmed)
+                {
+                    // If the email has not been confirmed, show a message to the user
+                    TempData["Error"] = "You must confirm your email to login.";
+                    return View(loginViewModel);
+                }
+
                 // Sign in the user.
                 var result = await _signInManager.PasswordSignInAsync(user, loginViewModel.Password, isPersistent: false, lockoutOnFailure: false);
 
@@ -101,6 +116,7 @@ namespace MovieScribe.Controllers
             TempData["Error"] = "Invalid credentials. Please try again.";
             return View(loginViewModel);
         }
+
 
 
         // Method that handles registration page request
@@ -120,53 +136,223 @@ namespace MovieScribe.Controllers
             return View(model);
         }
 
-        // Method that handles form submission on registration page
         [HttpPost]
-        public async Task<IActionResult> Register(RegisterViewModel registerViewModel)
+        public async Task<IActionResult> Register(RegisterViewModel model)
         {
-            // Check if the data sent in form is valid
-            if (!ModelState.IsValid)
-            {
-                return View(registerViewModel);
-            }
+            // ModelState.IsValid checks if the model (data sent to this method) meets all validation requirements
+            // If it doesn't, it returns the Register view with the model containing validation errors
+            if (!ModelState.IsValid) return View(model);
 
-            // Check if the email address or username already exists
-            var existingUser = await _userManager.FindByEmailAsync(registerViewModel.EmailAddress)
-                                ?? await _userManager.FindByNameAsync(registerViewModel.UserName);
-
-            // If the user already exists, send error message
-            if (existingUser != null)
+            // The code here creates a new instance of AppUser (which should be a class representing your User)
+            // It assigns values from the model to the new user instance
+            var user = new AppUser
             {
-                TempData["Error"] = "This email address or username is already taken";
-                return View(registerViewModel);
-            }
-
-            // Create new user
-            var newUser = new AppUser()
-            {
-                Email = registerViewModel.EmailAddress,
-                UserName = registerViewModel.UserName
+                UserName = model.UserName,
+                Email = model.EmailAddress,
             };
 
-            // Process profile picture upload
-            await ProcessImageUploadAsync(registerViewModel.ProfilePicture, newUser);
-
-            // Create new user in the identity system
-            var createUserResult = await _userManager.CreateAsync(newUser, registerViewModel.Password);
-
-            // If user creation is successful...
-            if (createUserResult.Succeeded)
+            // Process profile picture upload if there is one
+            if (model.ProfilePicture != null)
             {
-                // ...add user to 'User' role and redirect to login
-                await _userManager.AddToRoleAsync(newUser, UserRoles.User);
-                return RedirectToAction("Login", "Account");
+                await ProcessImageUploadAsync(model.ProfilePicture, user);
+            }
+            // The UserManager.CreateAsync method is called to create a new user in the system with a password
+            // The result of this operation is stored in 'result'
+            var result = await _userManager.CreateAsync(user, model.Password);
+
+            // Here it checks whether the user was created successfully
+            if (result.Succeeded)
+            {
+                // Logs that the new user was created successfully
+                _logger.LogInformation("User created a new account with password.");
+
+                // Generates an email confirmation token for the new user
+                // This token will be used to verify the user's email address
+                var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+                // Encode the generated token
+                var encodedCode = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
+                // Generate a callback URL for confirming the user's email
+                // This URL will lead the user to the ConfirmEmail action method of the Account controller
+                var callbackUrl = Url.Action(
+                    "ConfirmEmail",
+                    "Account",
+                    new { userId = user.Id, code = encodedCode },
+                    protocol: Request.Scheme);
+
+                // The EmailSender is used to send an email to the user
+                // The email will contain a link that the user can click to confirm their email address
+                await _emailSender.SendEmailAsync(model.EmailAddress, "Apstipriniet savu e-pastu",
+                    $"Lūdzu, apstipriniet savu kontu <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>klikšķinot šeit</a>.");
+
+                // Check whether the application requires confirmed accounts for sign-in
+                if (_userManager.Options.SignIn.RequireConfirmedAccount)
+                {
+                    // If a confirmed account is required, it redirects the user to the RegisterConfirmation action method
+                    // The user's email is passed along as a parameter
+                    return RedirectToAction("RegisterConfirmation", "Account", new { email = model.EmailAddress });
+                }
+                else
+                {
+                    // If a confirmed account is not required, it adds the user to the default 'User' role
+                    await _userManager.AddToRoleAsync(user, UserRoles.User);
+                    // Sign the user in
+                    await _signInManager.SignInAsync(user, isPersistent: false);
+                    // Redirect the user to the home page
+                    return LocalRedirect("~/");
+                }
             }
 
-            // If user creation failed, show error message
-            TempData["Error"] = "There was an issue with the provided password. Please ensure it meets complexity requirements.";
-            return View(registerViewModel);
+            // If the user creation was not successful, iterate over all the errors and add them to the ModelState
+            foreach (var error in result.Errors)
+            {
+                ModelState.AddModelError(string.Empty, error.Description);
+            }
+            // If we got this far, something failed. Redisplay the form with error messages
+            return View(model);
         }
 
+
+        [HttpGet]
+        public IActionResult RegisterConfirmation(string email)
+        {
+            // Assigns the user's email to a ViewBag variable which can be accessed in the View
+            ViewBag.Email = email;
+            // Returns the RegisterConfirmation view 
+            return View();
+        }
+
+
+        [HttpGet]
+        public async Task<IActionResult> ConfirmEmail(string userId, string code)
+        {
+            // If either the userId or code are null, it redirects to the Index page
+            if (userId == null || code == null)
+            {
+                return RedirectToPage("/Index");
+            }
+
+            // Tries to find a user with the provided userId
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user == null)
+            {
+                // If no user is found, returns a NotFound result
+                return NotFound($"Unable to load user with ID '{userId}'.");
+            }
+
+            // Decodes the code from Base64
+            code = Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(code));
+            // Confirms the user's email with the decoded code
+            var result = await _userManager.ConfirmEmailAsync(user, code);
+            if (!result.Succeeded)
+            {
+                // If the confirmation fails, throws an exception with the error details
+                throw new InvalidOperationException($"Error confirming email for user with ID '{userId}': " + result.Errors.Select(e => e.Description).FirstOrDefault());
+            }
+
+            // If the confirmation succeeds, redirects to the Home/Index page
+            return RedirectToAction("Index", "Home");
+        }
+
+        [HttpGet]
+        [AllowAnonymous]
+        public IActionResult ResetPassword(string userId, string code)
+        {
+            // If either the userId or code are null, it returns a BadRequest result
+            if (userId == null || code == null)
+            {
+                return BadRequest("A user ID and code must be supplied for password reset.");
+            }
+            else
+            {
+                // Creates a new instance of ResetPasswordViewModel with the provided userId and code
+                var model = new ResetPasswordViewModel
+                {
+                    Code = code,
+                    Email = userId
+                };
+                // Returns the ResetPassword view with the model
+                return View(model);
+            }
+        }
+
+        public IActionResult ResetPasswordConfirmation()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        [AllowAnonymous]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ResetPassword(ResetPasswordViewModel model)
+        {
+            // Checks if the received model is valid
+            if (!ModelState.IsValid)
+            {
+                // If it's not valid, return the ResetPassword view with the current model to display errors
+                return View(model);
+            }
+
+            // Tries to find a user with the provided email
+            var user = await _userManager.FindByEmailAsync(model.Email);
+            if (user == null)
+            {
+                // If no user is found, redirects to ResetPasswordConfirmation action
+                return RedirectToAction(nameof(AccountController.ResetPasswordConfirmation), "Account");
+            }
+            // Tries to reset the user's password with the provided model
+            var result = await _userManager.ResetPasswordAsync(user, model.Code, model.Password);
+            if (result.Succeeded)
+            {
+                // If the password reset is successful, redirects to ResetPasswordConfirmation action
+                return RedirectToAction(nameof(AccountController.ResetPasswordConfirmation), "Account");
+            }
+
+            // If the password reset fails, adds all error messages to the ModelState
+            foreach (var error in result.Errors)
+            {
+                ModelState.AddModelError(string.Empty, error.Description);
+            }
+            // Returns the ResetPassword view with the current model to display errors
+            return View();
+        }
+
+        [HttpGet]
+        public IActionResult ForgotPassword()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ForgotPassword(ForgotPasswordViewModel model)
+        {
+            // Checks if the received model is valid
+            if (ModelState.IsValid)
+            {
+                // Tries to find a user with the provided email
+                var user = await _userManager.FindByEmailAsync(model.Email);
+                // If the user is not found or their email is not confirmed, returns the ForgotPasswordConfirmation view
+                if (user == null || !(await _userManager.IsEmailConfirmedAsync(user)))
+                {
+                    return View("ForgotPasswordConfirmation");
+                }
+
+                // Generates a password reset token for the user
+                var code = await _userManager.GeneratePasswordResetTokenAsync(user);
+                // Generates a password reset link that will be sent to the user
+                var callbackUrl = Url.Action(nameof(ResetPassword), "Account", new { userId = user.Email, code = code }, protocol: HttpContext.Request.Scheme);
+                // Sends a password reset email to the user
+                await _emailSender.SendEmailAsync(
+                    model.Email,
+                    "Atiestatīt paroli",
+                    $"Lūdzu, atiestatiet paroli, noklikšķinot šeit: <a href='{callbackUrl}'>saite</a>");
+                // Returns the ForgotPasswordConfirmation view
+                return View("ForgotPasswordConfirmation");
+            }
+
+            // If the model is not valid, returns the ForgotPassword view with the current model to display errors
+            return View(model);
+        }
 
         [HttpPost]
         public async Task<IActionResult> Logout()
